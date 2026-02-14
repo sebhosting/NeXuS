@@ -1,0 +1,56 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['nexus-prometheus:9090']
+
+  # NeXuS services
+  - job_name: 'nexus-api'
+    static_configs:
+      - targets: ['nexus-api:4000']
+
+  - job_name: 'nexus-cms'
+    static_configs:
+      - targets: ['nexus-cms:7000']
+
+  - job_name: 'nexus-cdn'
+    static_configs:
+      - targets: ['nexus-cdn:7001']
+
+  - job_name: 'nexus-cache'
+    static_configs:
+      - targets: ['nexus-cache:7002']
+
+  - job_name: 'nexus-auth'
+    static_configs:
+      - targets: ['nexus-auth:6000']
+
+  - job_name: 'nexus-waf'
+    static_configs:
+      - targets: ['nexus-waf:7003']
+
+  - job_name: 'nexus-ai'
+    static_configs:
+      - targets: ['nexus-ai:5000']
+
+  # Databases (if exporters installed)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['nexus-postgres:5432']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['nexus-redis:6379']
+
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['nexus-mongodb:27017']
+
+  - job_name: 'memcached'
+    static_configs:
+      - targets: ['nexus-memcached:11211']

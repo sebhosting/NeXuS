@@ -1,0 +1,235 @@
+services:
+
+  # ─── PUBLIC SERVICES (Traefik routed) ────────────────────────
+
+  nexus:
+    build: ../../frontend
+    container_name: nexus-frontend
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus.rule=Host(`nexus.sebhosting.com`)"
+      - "traefik.http.routers.nexus.entrypoints=websecure"
+      - "traefik.http.routers.nexus.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik-public"
+
+  api:
+    build: ../../backend
+    container_name: nexus-api
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+      - mongodb
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-api.rule=Host(`api.sebhosting.com`)"
+      - "traefik.http.routers.nexus-api.entrypoints=websecure"
+      - "traefik.http.routers.nexus-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-api.loadbalancer.server.port=4000"
+      - "traefik.docker.network=traefik-public"
+
+  cms-service:
+    build: ../../services/cms-service
+    container_name: nexus-cms
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - postgres
+      - mongodb
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-cms.rule=Host(`cms.sebhosting.com`)"
+      - "traefik.http.routers.nexus-cms.entrypoints=websecure"
+      - "traefik.http.routers.nexus-cms.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-cms.loadbalancer.server.port=7000"
+      - "traefik.docker.network=traefik-public"
+
+  cdn-service:
+    build: ../../services/cdn-service
+    container_name: nexus-cdn
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-cdn.rule=Host(`cdn.sebhosting.com`)"
+      - "traefik.http.routers.nexus-cdn.entrypoints=websecure"
+      - "traefik.http.routers.nexus-cdn.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-cdn.loadbalancer.server.port=7001"
+      - "traefik.docker.network=traefik-public"
+
+  cache-service:
+    build: ../../services/cache-service
+    container_name: nexus-cache
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - redis
+      - memcached
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-cache.rule=Host(`cache.sebhosting.com`)"
+      - "traefik.http.routers.nexus-cache.entrypoints=websecure"
+      - "traefik.http.routers.nexus-cache.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-cache.loadbalancer.server.port=7002"
+      - "traefik.docker.network=traefik-public"
+
+  auth-service:
+    build: ../../services/auth-service
+    container_name: nexus-auth
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-auth.rule=Host(`auth.sebhosting.com`)"
+      - "traefik.http.routers.nexus-auth.entrypoints=websecure"
+      - "traefik.http.routers.nexus-auth.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-auth.loadbalancer.server.port=6000"
+      - "traefik.docker.network=traefik-public"
+
+  waf-service:
+    build: ../../services/waf-service
+    container_name: nexus-waf
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-waf.rule=Host(`waf.sebhosting.com`)"
+      - "traefik.http.routers.nexus-waf.entrypoints=websecure"
+      - "traefik.http.routers.nexus-waf.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-waf.loadbalancer.server.port=7003"
+      - "traefik.docker.network=traefik-public"
+
+  ai-gateway:
+    build: ../../services/ai-gateway
+    container_name: nexus-ai
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-ai.rule=Host(`ai-gateway.sebhosting.com`)"
+      - "traefik.http.routers.nexus-ai.entrypoints=websecure"
+      - "traefik.http.routers.nexus-ai.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-ai.loadbalancer.server.port=5000"
+      - "traefik.docker.network=traefik-public"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: nexus-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_SERVER_ROOT_URL: https://grafana.sebhosting.com
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-grafana.rule=Host(`grafana.sebhosting.com`)"
+      - "traefik.http.routers.nexus-grafana.entrypoints=websecure"
+      - "traefik.http.routers.nexus-grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-grafana.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik-public"
+
+  # ─── DATABASES (internal only - NO Traefik) ──────────────────
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: nexus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nexus
+      POSTGRES_USER: seb
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      # Restrict connections - no trust auth
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - nexus-internal        # ← internal ONLY, not traefik-public
+    # NO traefik labels - databases are never public
+
+  redis:
+    image: redis:7-alpine
+    container_name: nexus-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD}
+      --bind 0.0.0.0
+      --protected-mode yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    networks:
+      - nexus-internal        # ← internal ONLY
+    # NO traefik labels
+
+  mongodb:
+    image: mongo:7
+    container_name: nexus-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: seb
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: nexus
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - nexus-internal        # ← internal ONLY
+    # NO traefik labels
+
+  memcached:
+    image: memcached:alpine
+    container_name: nexus-memcached
+    restart: unless-stopped
+    networks:
+      - nexus-internal        # ← internal ONLY
+    # NO traefik labels
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  grafana_data:
+
+networks:
+  traefik-public:
+    external: true            # ← exists already, managed by Traefik
+  nexus-internal:
+    driver: bridge            # ← private network, databases live here
+    internal: true            # ← no external routing allowed

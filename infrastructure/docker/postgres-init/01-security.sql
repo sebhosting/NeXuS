@@ -1,0 +1,20 @@
+-- Remove world access from public schema
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+GRANT ALL ON SCHEMA public TO seb;
+
+-- Least-privilege app role
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'nexus_app') THEN
+    CREATE ROLE nexus_app WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE CONNECTION LIMIT 20;
+  END IF;
+END $$;
+
+GRANT CONNECT ON DATABASE NeXuS TO nexus_app;
+GRANT USAGE ON SCHEMA public TO nexus_app;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE seb IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nexus_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE seb IN SCHEMA public
+  GRANT USAGE, SELECT ON SEQUENCES TO nexus_app;
+
+SELECT 'Security init complete' AS status;

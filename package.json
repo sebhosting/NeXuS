@@ -1,0 +1,29 @@
+{
+  "name": "NeXuS",
+  "version": "3.0.0",
+  "description": "SEB's NeXuS Manager - Complete Infrastructure Platform",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "services/*"
+  ],
+  "scripts": {
+    "install-all": "npm install && npm run install:services",
+    "install:services": "for dir in services/*; do cd $dir && npm install && cd ../..; done",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend && npm run build:services",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build:services": "for dir in services/*; do cd $dir && npm run build 2>/dev/null || true && cd ../..; done",
+    "docker:up": "docker-compose -f infrastructure/docker/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f infrastructure/docker/docker-compose.yml down",
+    "docker:logs": "docker-compose -f infrastructure/docker/docker-compose.yml logs -f"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "concurrently": "^9.2.1"
+  }
+}
