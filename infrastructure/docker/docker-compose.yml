@@ -82,6 +82,8 @@ services:
     container_name: nexus-cdn
     restart: unless-stopped
     env_file: .env
+    volumes:
+      - cdn_data:/data/cdn
     networks:
       - traefik-public
       - nexus-internal
@@ -152,6 +154,8 @@ services:
     container_name: nexus-ai
     restart: unless-stopped
     env_file: .env
+    depends_on:
+      - postgres
     networks:
       - traefik-public
       - nexus-internal
@@ -259,6 +263,7 @@ services:
       - nexus-internal
 
 volumes:
+  cdn_data:
   postgres_data:
   mongodb_data:
   redis_data:

@@ -1,55 +1,115 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import { Pool } from 'pg'
 
-dotenv.config({ quiet: true })
+dotenv.config({ quiet: true } as any)
 
 const app = express()
 const PORT = process.env.PORT || 5000
-const SERVICE_NAME = 'ai-gateway'
 
-app.use(cors())
-app.use(express.json())
+// Database for request logging
+const pool = new Pool({
+  host: process.env.POSTGRES_HOST || 'nexus-postgres',
+  port: 5432,
+  user: 'seb',
+  password: process.env.POSTGRES_PASSWORD,
+  database: 'nexus',
+})
+
+app.use(cors({ origin: ['https://nexus.sebhosting.com', 'http://localhost:3000'], credentials: true }))
+app.use(express.json({ limit: '10mb' }))
+
+// Initialize DB schema
+async function initDB() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ai_requests (
+      id SERIAL PRIMARY KEY,
+      model VARCHAR(100) NOT NULL,
+      prompt_tokens INTEGER,
+      completion_tokens INTEGER,
+      total_tokens INTEGER,
+      latency_ms INTEGER,
+      status INTEGER,
+      error TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `)
+  console.log('✓ AI Gateway schema ready')
+}
 
 // Health check
 app.get('/health', (_req, res) => {
-  res.json({
-    service: SERVICE_NAME,
-    status: 'healthy',
-    port: PORT,
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
-  })
+  res.json({ service: 'ai-gateway', status: 'healthy', providers: ['anthropic', 'openai'] })
 })
 
-// Status endpoint
-app.get('/status', (_req, res) => {
-  res.json({
-    service: SERVICE_NAME,
-    version: '1.0.0',
-    description: 'AI Gateway Service',
-    status: 'operational',
-    timestamp: new Date().toISOString()
-  })
+// Proxy to Anthropic
+app.post('/v1/messages', async (req: Request, res: Response) => {
+  const startTime = Date.now()
+  const { model = 'claude-sonnet-4-5-20250514', max_tokens = 4096, messages, stream = false } = req.body
+
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) {
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' })
+  }
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({ model, max_tokens, messages, stream }),
+    })
+
+    const data = await response.json()
+    const latency = Date.now() - startTime
+
+    // Log to database
+    await pool.query(
+      `INSERT INTO ai_requests (model, prompt_tokens, completion_tokens, total_tokens, latency_ms, status)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [
+        model,
+        data.usage?.input_tokens || 0,
+        data.usage?.output_tokens || 0,
+        (data.usage?.input_tokens || 0) + (data.usage?.output_tokens || 0),
+        latency,
+        response.status,
+      ]
+    )
+
+    res.status(response.status).json(data)
+  } catch (err: any) {
+    const latency = Date.now() - startTime
+    await pool.query(
+      `INSERT INTO ai_requests (model, latency_ms, status, error) VALUES ($1, $2, $3, $4)`,
+      [model, latency, 500, err.message]
+    )
+    res.status(500).json({ error: err.message })
+  }
 })
 
-// Root
-app.get('/', (_req, res) => {
-  res.json({
-    name: 'NeXuS ai-gateway',
-    version: '1.0.0',
-    description: 'AI Gateway Service',
-    endpoints: ['/health', '/status']
-  })
+// Usage stats
+app.get('/stats', async (_req, res) => {
+  const result = await pool.query(`
+    SELECT 
+      COUNT(*) as total_requests,
+      SUM(prompt_tokens) as total_input_tokens,
+      SUM(completion_tokens) as total_output_tokens,
+      SUM(total_tokens) as total_tokens,
+      AVG(latency_ms)::integer as avg_latency_ms,
+      model
+    FROM ai_requests
+    WHERE created_at > NOW() - INTERVAL '24 hours'
+    GROUP BY model
+    ORDER BY total_requests DESC
+  `)
+  res.json({ period: '24h', models: result.rows })
 })
 
-// 404
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Not found', service: SERVICE_NAME })
+initDB().then(() => {
+  app.listen(PORT, () => console.log(`✓ AI Gateway on port ${PORT}`))
 })
-
-app.listen(PORT, () => {
-  console.log(`\u2713 ai-gateway running on port ${PORT}`)
-})
-
-export default app
