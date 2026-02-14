@@ -113,3 +113,18 @@ app.get('/stats', async (_req, res) => {
 initDB().then(() => {
   app.listen(PORT, () => console.log(`✓ AI Gateway on port ${PORT}`))
 })
+
+// Root route
+app.get('/', (_req, res) => {
+  res.json({
+    service: 'nexus-ai-gateway',
+    version: '1.0.0',
+    status: 'healthy',
+    providers: ['anthropic', 'openai'],
+    endpoints: {
+      messages: 'POST /v1/messages (Anthropic proxy)',
+      stats: 'GET /stats (24h usage)',
+      health: 'GET /health'
+    }
+  })
+})

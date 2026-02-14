@@ -100,3 +100,17 @@ client.connect().then(() => {
   console.log('✓ MongoDB connected')
   app.listen(PORT, () => console.log(`✓ CMS service on port ${PORT}`))
 })
+
+// Root route
+app.get('/', (_req, res) => {
+  res.json({
+    service: 'nexus-cms',
+    version: '1.0.0',
+    status: 'healthy',
+    endpoints: {
+      pages: 'GET /pages, POST /pages, GET /pages/:id, PUT /pages/:id, DELETE /pages/:id',
+      posts: 'GET /posts, POST /posts',
+      health: 'GET /health'
+    }
+  })
+})

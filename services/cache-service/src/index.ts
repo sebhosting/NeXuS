@@ -101,3 +101,20 @@ app.post('/flush', async (_req, res) => {
 redis.connect().then(() => {
   app.listen(PORT, () => console.log(`✓ Cache service on port ${PORT}`))
 })
+
+// Root route
+app.get('/', (_req, res) => {
+  res.json({
+    service: 'nexus-cache',
+    version: '1.0.0',
+    status: 'healthy',
+    backend: 'redis',
+    endpoints: {
+      stats: 'GET /stats',
+      keys: 'GET /keys?pattern=*&cursor=0',
+      key: 'GET /key/:key, POST /key {key, value, ttl}, DELETE /key/:key',
+      flush: 'POST /flush',
+      health: 'GET /health'
+    }
+  })
+})

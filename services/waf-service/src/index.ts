@@ -53,3 +53,16 @@ app.listen(PORT, () => {
 })
 
 export default app
+
+// Root route
+app.get('/', (_req, res) => {
+  res.json({
+    service: 'nexus-waf',
+    version: '1.0.0',
+    status: 'healthy',
+    features: ['rate-limiting', 'ip-blocking', 'request-validation'],
+    endpoints: {
+      health: 'GET /health'
+    }
+  })
+})

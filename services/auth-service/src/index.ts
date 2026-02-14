@@ -45,3 +45,20 @@ db.initSchema().then(() => {
   console.error('DB init failed:', err)
   process.exit(1)
 })
+
+// Root route  
+app.get('/', (_req, res) => {
+  res.json({
+    service: 'nexus-auth',
+    version: '1.0.0',
+    status: 'healthy',
+    auth: 'jwt',
+    endpoints: {
+      login: 'POST /auth/login {email, password}',
+      register: 'POST /auth/register {email, password}',
+      refresh: 'POST /auth/refresh {refreshToken}',
+      logout: 'POST /auth/logout',
+      health: 'GET /health'
+    }
+  })
+})

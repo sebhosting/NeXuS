@@ -106,3 +106,17 @@ app.delete('/files/:id', async (req, res) => {
 initDB().then(() => {
   app.listen(PORT, () => console.log(`✓ CDN service on port ${PORT}`))
 })
+
+// Root route
+app.get('/', (_req, res) => {
+  res.json({
+    service: 'nexus-cdn',
+    version: '1.0.0',
+    status: 'healthy',
+    endpoints: {
+      upload: 'POST /upload (multipart/form-data)',
+      files: 'GET /files (list), GET /files/:filename (download), DELETE /files/:id',
+      health: 'GET /health'
+    }
+  })
+})
