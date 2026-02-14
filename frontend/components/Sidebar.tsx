@@ -18,10 +18,14 @@ const SERVICES = [
   { label: 'AI Gateway',  url: 'https://ai-gateway.sebhosting.com', icon: '⬡' },
 ]
 
+const SITES = [
+  { label: 'SEBHosting.com', url: 'https://sebhosting.com',            icon: '🌐' },
+]
+
 const TOOLS = [
   { label: 'Grafana',     url: 'https://grafana.sebhosting.com',    icon: '📊' },
+  { label: 'Prometheus',  url: 'https://prometheus.sebhosting.com', icon: '🔥' },
   { label: 'Traefik',     url: 'https://traefik.sebhosting.com',    icon: '🔀' },
-  { label: 'Prometheus',  url: 'https://prometheus.sebhosting.com', icon: '📊' },
 ]
 
 const itemStyle = (active: boolean, hover: boolean) => ({
@@ -123,6 +127,9 @@ export default function Sidebar() {
 
           <Section label="SERVICES" />
           {SERVICES.map(s => <ExtItem key={s.url} {...s} dot="green" />)}
+
+          <Section label="SITES" />
+          {SITES.map(s => <ExtItem key={s.url} {...s} dot="green" />)}
 
           <Section label="TOOLS" />
           {TOOLS.map(t => <ExtItem key={t.url} {...t} dot="green" />)}
