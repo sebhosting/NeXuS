@@ -20,75 +20,64 @@ jobs:
         node-version: [25.4.0]
 
     steps:
-      # Checkout code
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # 1️⃣ Checkout code
+      - uses: actions/checkout@v4
 
-      # Setup Node.js
+      # 2️⃣ Setup Node.js
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: 'npm'
 
-      # Upgrade npm to 11.10.0
+      # 3️⃣ Upgrade npm
       - name: Upgrade npm
         run: npm install -g npm@11.10.0
 
-      # Install root dependencies (workspaces)
-      - name: Install root dependencies
-        run: npm install --workspaces
+      # 4️⃣ Install root dependencies (all workspaces)
+      - name: Install all dependencies
+        run: npm install --workspaces --include-workspace-root
 
-      # Cache node_modules per workspace
-      - name: Cache workspaces node_modules
+      # 5️⃣ Cache all workspace node_modules dynamically
+      - name: Cache workspaces
+        id: cache
         uses: actions/cache@v3
         with:
           path: |
-            frontend/node_modules
-            backend/node_modules
-            services/ai-gateway/node_modules
-            services/cdn-service/node_modules
-            services/cms-service/node_modules
-            services/mcp-server/node_modules
-            services/cache-service/node_modules
-            services/auth-service/node_modules
+            node_modules
+            $(find . -type d -name node_modules -prune)
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
-      # Build backend
+      # 6️⃣ Build backend
       - name: Build backend
-        run: |
-          cd backend
-          npm run build
+        run: cd backend && npm run build
 
-      # Build frontend
+      # 7️⃣ Build frontend
       - name: Build frontend
-        run: |
-          cd frontend
-          npm run build
+        run: cd frontend && npm run build
 
-      # Build services
+      # 8️⃣ Build all services dynamically
       - name: Build all services
         run: |
           for dir in services/*; do
             echo "Building $dir"
-            cd $dir
+            cd "$dir"
             npm run build || true
-            cd ../..
+            cd - > /dev/null
           done
 
-      # Placeholder: Run linter (optional)
-      - name: Lint frontend & backend
+      # 9️⃣ Lint frontend & backend
+      - name: Lint
         run: |
           cd frontend && npm run lint
           cd ../backend && npm run lint || true
 
-      # Placeholder: Run tests (optional)
+      # 🔟 Placeholder: Tests
       - name: Run tests
-        run: |
-          echo "No tests configured yet"
+        run: echo "No tests configured yet"
 
-      # Finished
+      # ✅ CI complete
       - name: CI complete
         run: echo "NeXuS CI pipeline finished successfully ✅"
