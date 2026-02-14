@@ -34,13 +34,12 @@ jobs:
       - name: Upgrade npm
         run: npm install -g npm@11.10.0
 
-      # 4️⃣ Install root dependencies (all workspaces)
-      - name: Install all dependencies
+      # 4️⃣ Install all dependencies with workspaces
+      - name: Install dependencies
         run: npm install --workspaces --include-workspace-root
 
       # 5️⃣ Cache all workspace node_modules dynamically
-      - name: Cache workspaces
-        id: cache
+      - name: Cache node_modules
         uses: actions/cache@v3
         with:
           path: |
@@ -52,29 +51,30 @@ jobs:
 
       # 6️⃣ Build backend
       - name: Build backend
-        run: cd backend && npm run build
+        run: npm run build --workspace backend
 
       # 7️⃣ Build frontend
       - name: Build frontend
-        run: cd frontend && npm run build
+        run: npm run build --workspace frontend
 
       # 8️⃣ Build all services dynamically
-      - name: Build all services
+      - name: Build services
         run: |
           for dir in services/*; do
             echo "Building $dir"
-            cd "$dir"
-            npm run build || true
-            cd - > /dev/null
+            npm run build --workspace "$dir" || true
           done
 
-      # 9️⃣ Lint frontend & backend
-      - name: Lint
+      # 9️⃣ Lint backend, frontend, and services
+      - name: Lint all workspaces
         run: |
-          cd frontend && npm run lint
-          cd ../backend && npm run lint || true
+          npm run lint --workspace frontend
+          npm run lint --workspace backend || true
+          for dir in services/*; do
+            npm run lint --workspace "$dir" || true
+          done
 
-      # 🔟 Placeholder: Tests
+      # 🔟 Placeholder: Run tests
       - name: Run tests
         run: echo "No tests configured yet"
 
