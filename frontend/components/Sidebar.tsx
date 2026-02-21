@@ -4,9 +4,11 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 
 const NAV = [
-  { label: 'Dashboard',   href: '/dashboard',          icon: '⬡' },
-  { label: 'Services',    href: '/dashboard/services',  icon: '⬡' },
-  { label: 'MCP Server',  href: '/dashboard/mcp',       icon: '⬡' },
+  { label: 'Dashboard',   href: '/dashboard',           icon: '⬡' },
+  { label: 'Services',    href: '/dashboard/services',   icon: '⬡' },
+  { label: 'DNS',         href: '/dashboard/dns',        icon: '⬡' },
+  { label: 'MCP Server',  href: '/dashboard/mcp',        icon: '⬡' },
+  { label: 'Grafana',     href: '/dashboard/grafana',    icon: '📊' },
 ]
 
 const SERVICES = [
@@ -23,30 +25,28 @@ const SITES = [
 ]
 
 const TOOLS = [
-  { label: 'Grafana',     url: 'https://grafana.sebhosting.com',    icon: '📊' },
+  { label: 'Grafana',     url: 'https://nexus.sebhosting.com/grafana',    icon: '📊' },
   { label: 'Prometheus',  url: 'https://prometheus.sebhosting.com', icon: '🔥' },
   { label: 'Traefik',     url: 'https://traefik.sebhosting.com',    icon: '🔀' },
 ]
-
-const itemStyle = (active: boolean, hover: boolean) => ({
-  display: 'flex', alignItems: 'center', gap: '10px',
-  padding: '8px 16px', borderRadius: '4px', cursor: 'pointer',
-  background: active ? 'rgba(0,212,255,0.1)' : hover ? 'var(--bg-hover)' : 'transparent',
-  borderLeft: active ? '2px solid var(--cyan)' : '2px solid transparent',
-  color: active ? 'var(--cyan)' : 'var(--text-secondary)',
-  fontFamily: 'Rajdhani', fontWeight: 600, fontSize: '13px',
-  letterSpacing: '1px', textDecoration: 'none',
-  transition: 'all 0.15s',
-})
 
 function NavItem({ href, label, icon }: { href: string, label: string, icon: string }) {
   const pathname = usePathname()
   const active = pathname === href
   const [hover, setHover] = useState(false)
   return (
-    <Link href={href} style={itemStyle(active, hover) as React.CSSProperties}
+    <Link href={href}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '10px 16px', borderRadius: '8px', cursor: 'pointer',
+        background: active ? 'rgba(255,180,0,0.08)' : hover ? 'rgba(255,255,255,0.03)' : 'transparent',
+        borderLeft: active ? '3px solid var(--highlight)' : '3px solid transparent',
+        color: active ? 'var(--highlight)' : hover ? 'var(--text)' : 'var(--muted)',
+        fontWeight: active ? 700 : 500, fontSize: '0.95rem',
+        textDecoration: 'none', transition: 'all 0.2s',
+      }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-      <span style={{ fontSize: '16px', opacity: 0.7 }}>{icon}</span>
+      <span style={{ fontSize: '14px', opacity: 0.6 }}>{icon}</span>
       {label}
     </Link>
   )
@@ -56,19 +56,31 @@ function ExtItem({ url, label, icon, dot }: { url: string, label: string, icon: 
   const [hover, setHover] = useState(false)
   return (
     <a href={url} target="_blank" rel="noopener noreferrer"
-      style={itemStyle(false, hover) as React.CSSProperties}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '10px 16px', borderRadius: '8px', cursor: 'pointer',
+        background: hover ? 'rgba(255,255,255,0.03)' : 'transparent',
+        borderLeft: '3px solid transparent',
+        color: hover ? 'var(--text)' : 'var(--muted)',
+        fontWeight: 500, fontSize: '0.95rem',
+        textDecoration: 'none', transition: 'all 0.2s',
+      }}
       onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-      <span style={{ fontSize: '15px' }}>{icon}</span>
+      <span style={{ fontSize: '14px' }}>{icon}</span>
       <span style={{ flex: 1 }}>{label}</span>
-      {dot && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--green)', boxShadow: '0 0 5px var(--green)', flexShrink: 0 }} />}
-      <span style={{ fontSize: '9px', opacity: 0.4 }}>↗</span>
+      {dot && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)', boxShadow: '0 0 5px var(--success)', flexShrink: 0 }} />}
+      <span style={{ fontSize: '10px', opacity: 0.3 }}>↗</span>
     </a>
   )
 }
 
 function Section({ label }: { label: string }) {
   return (
-    <div style={{ padding: '12px 16px 4px', fontFamily: 'JetBrains Mono', fontSize: '9px', letterSpacing: '2px', color: 'var(--text-dim)', userSelect: 'none' }}>
+    <div style={{
+      padding: '16px 16px 6px', fontFamily: "'Courier New', monospace",
+      fontSize: '0.7rem', letterSpacing: '2px', color: 'var(--muted)',
+      userSelect: 'none', opacity: 0.6, textTransform: 'uppercase',
+    }}>
       {label}
     </div>
   )
@@ -79,34 +91,34 @@ export default function Sidebar() {
 
   return (
     <aside style={{
-      width: collapsed ? '52px' : '220px',
-      background: 'var(--bg-surface)',
-      borderRight: '1px solid var(--border)',
+      width: collapsed ? '56px' : '240px',
+      background: '#05081a',
+      borderRight: '1px solid var(--border-accent)',
       display: 'flex', flexDirection: 'column',
       transition: 'width 0.2s ease',
       flexShrink: 0, overflow: 'hidden',
     }}>
       {/* Logo */}
       <div style={{
-        height: '52px', display: 'flex', alignItems: 'center',
+        height: '56px', display: 'flex', alignItems: 'center',
         padding: collapsed ? '0 14px' : '0 16px', gap: '12px',
-        borderBottom: '1px solid var(--border)', flexShrink: 0,
+        borderBottom: '1px solid var(--border-accent)', flexShrink: 0,
       }}>
         <div style={{
-          width: '24px', height: '24px', flexShrink: 0,
-          background: 'var(--cyan)',
-          clipPath: 'polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%)',
-          boxShadow: '0 0 12px var(--cyan-dim)',
-        }} />
+          fontFamily: "'Courier New', monospace",
+          fontSize: '1.4rem', fontWeight: 900,
+          color: 'var(--accent)', flexShrink: 0,
+        }}>
+          &lt;/&gt;
+        </div>
         {!collapsed && (
-          <div>
-            <div style={{ fontFamily: 'Rajdhani', fontSize: '15px', fontWeight: 700, letterSpacing: '3px', color: 'var(--cyan)', lineHeight: 1 }}>NEXUS</div>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: '8px', color: 'var(--text-dim)', letterSpacing: '2px' }}>MGR v3.0</div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text)', letterSpacing: '1px' }}>
+            NeXuS
           </div>
         )}
         {!collapsed && (
           <button onClick={() => setCollapsed(true)}
-            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: '14px', padding: '2px' }}>
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '14px', padding: '2px', transition: 'color 0.2s' }}>
             ◀
           </button>
         )}
@@ -114,7 +126,7 @@ export default function Sidebar() {
 
       {collapsed && (
         <button onClick={() => setCollapsed(false)}
-          style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', padding: '12px', fontSize: '14px' }}>
+          style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', padding: '14px', fontSize: '14px' }}>
           ▶
         </button>
       )}
@@ -122,24 +134,28 @@ export default function Sidebar() {
       {/* Nav */}
       {!collapsed && (
         <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-          <Section label="NAVIGATION" />
+          <Section label="Navigation" />
           {NAV.map(n => <NavItem key={n.href} {...n} />)}
 
-          <Section label="SERVICES" />
+          <Section label="Services" />
           {SERVICES.map(s => <ExtItem key={s.url} {...s} dot="green" />)}
 
-          <Section label="SITES" />
+          <Section label="Sites" />
           {SITES.map(s => <ExtItem key={s.url} {...s} dot="green" />)}
 
-          <Section label="TOOLS" />
+          <Section label="Tools" />
           {TOOLS.map(t => <ExtItem key={t.url} {...t} dot="green" />)}
         </div>
       )}
 
       {/* Version */}
       {!collapsed && (
-        <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', fontFamily: 'JetBrains Mono', fontSize: '8px', color: 'var(--text-dim)', letterSpacing: '1px' }}>
-          NODE: {process.env.NODE_ENV || 'production'}
+        <div style={{
+          padding: '14px 16px', borderTop: '1px solid var(--border-accent)',
+          fontFamily: "'Courier New', monospace", fontSize: '0.65rem',
+          color: 'var(--muted)', letterSpacing: '1px', opacity: 0.5,
+        }}>
+          NEXUS MGR v3.0
         </div>
       )}
     </aside>

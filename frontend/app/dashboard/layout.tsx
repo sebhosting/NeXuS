@@ -6,11 +6,12 @@ import Topbar from '@/components/Topbar'
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
-      <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <div className="grid-bg" />
+      <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', position: 'relative', zIndex: 1 }}>
         <Sidebar />
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
           <Topbar />
-          <main className="flex-1 overflow-auto p-6" style={{ background: 'var(--bg-base)' }}>
+          <main style={{ flex: 1, overflow: 'auto', padding: '32px' }}>
             {children}
           </main>
         </div>

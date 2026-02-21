@@ -1,80 +1,73 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-base:      #08080f;
-  --bg-surface:   #0d0d18;
-  --bg-card:      #11111f;
-  --bg-hover:     #16162a;
-  --border:       #1e1e35;
-  --border-glow:  #00d4ff30;
-  --cyan:         #00d4ff;
-  --cyan-dim:     #00d4ff60;
-  --green:        #00ff88;
-  --green-dim:    #00ff8840;
-  --amber:        #ffaa00;
-  --amber-dim:    #ffaa0040;
-  --red:          #ff3366;
-  --red-dim:      #ff336640;
-  --purple:       #9d4edd;
-  --text-primary: #e8e8f0;
-  --text-muted:   #6b7280;
-  --text-dim:     #4b5563;
+  --bg:         #0b1220;
+  --panel:      #10172a;
+  --text:       #f3f6fa;
+  --muted:      #8ea2b5;
+  --accent:     #4cc9f0;
+  --accent-2:   #38bdf8;
+  --highlight:  #ffb400;
+  --success:    #22c55e;
+  --red:        #ef4444;
+  --red-dim:    rgba(239, 68, 68, 0.15);
+  --radius:     18px;
+  --radius-sm:  12px;
+  --shadow:     0 10px 30px rgba(0, 0, 0, 0.35);
+  --border:     rgba(255, 255, 255, 0.1);
+  --border-accent: rgba(76, 201, 240, 0.2);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
   overflow-x: hidden;
 }
 
-/* Scanline overlay */
-body::before {
-  content: '';
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.font-mono { font-family: 'Courier New', monospace; }
+
+/* Grid background */
+.grid-bg {
   position: fixed;
-  inset: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0,0,0,0.03) 2px,
-    rgba(0,0,0,0.03) 4px
-  );
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image:
+    linear-gradient(rgba(76, 201, 240, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(76, 201, 240, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 0;
   pointer-events: none;
-  z-index: 9999;
 }
 
-.font-mono { font-family: 'JetBrains Mono', monospace; }
-
-/* Glow effects */
-.glow-cyan  { box-shadow: 0 0 20px var(--cyan-dim),  0 0 40px var(--cyan-dim); }
-.glow-green { box-shadow: 0 0 20px var(--green-dim), 0 0 40px var(--green-dim); }
-.glow-red   { box-shadow: 0 0 20px var(--red-dim),   0 0 40px var(--red-dim); }
-
-/* Animated border */
-@keyframes borderPulse {
-  0%, 100% { border-color: var(--border); }
-  50%       { border-color: var(--border-glow); }
-}
-
+/* Cards */
 .card {
-  background: var(--bg-card);
+  background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 4px;
-  transition: border-color 0.3s, background 0.2s;
+  border-radius: var(--radius);
+  transition: all 0.4s;
 }
-.card:hover { border-color: var(--cyan-dim); background: var(--bg-hover); }
+.card:hover {
+  box-shadow: 0 15px 40px rgba(255, 180, 0, 0.2);
+  background: rgba(255, 180, 0, 0.03);
+}
 
 /* Status dot pulse */
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(0.8); }
+  50%      { opacity: 0.5; transform: scale(0.8); }
 }
 .status-dot { animation: pulse 2s infinite; }
 
@@ -86,16 +79,13 @@ body::before {
 .stat-number { animation: countUp 0.6s ease-out forwards; }
 
 /* Scrollbar */
-::-webkit-scrollbar       { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg-base); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: var(--cyan-dim); }
+::-webkit-scrollbar       { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(76, 201, 240, 0.3); }
 
-/* Grid lines background */
-.grid-bg {
-  background-image:
-    linear-gradient(var(--border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-position: -1px -1px;
+/* Select dropdown fix for dark theme */
+select option {
+  background: var(--panel);
+  color: var(--text);
 }

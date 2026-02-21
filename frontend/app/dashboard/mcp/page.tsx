@@ -13,51 +13,27 @@ export default function MCPPage() {
   ]
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1200px' }}>
+    <div>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ 
-          fontSize: '28px', 
-          fontWeight: 700, 
-          fontFamily: 'Rajdhani',
-          letterSpacing: '2px',
-          color: 'var(--cyan)',
-          marginBottom: '8px'
-        }}>
-          MCP SERVER
+        <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text)', letterSpacing: '-0.5px', marginBottom: '8px' }}>
+          MCP <span style={{ color: 'var(--highlight)' }}>Server</span>
         </h1>
-        <p style={{ 
-          color: 'var(--text-secondary)', 
-          fontSize: '14px',
-          fontFamily: 'JetBrains Mono',
-          marginBottom: '16px'
-        }}>
+        <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '16px' }}>
           Model Context Protocol integration for Claude Code
         </p>
-        
+
         {/* Status Badge */}
         <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '8px 16px',
-          background: 'rgba(0,255,135,0.1)',
-          border: '1px solid rgba(0,255,135,0.3)',
-          borderRadius: '20px',
+          display: 'inline-flex', alignItems: 'center', gap: '8px',
+          padding: '8px 18px', background: 'rgba(34,197,94,0.08)',
+          border: '1px solid rgba(34,197,94,0.2)', borderRadius: '20px',
         }}>
           <div style={{
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: 'var(--green)',
-            boxShadow: '0 0 8px var(--green)',
+            width: '8px', height: '8px', borderRadius: '50%',
+            background: 'var(--success)', boxShadow: '0 0 8px var(--success)',
           }} />
-          <span style={{
-            fontSize: '12px',
-            fontFamily: 'JetBrains Mono',
-            color: 'var(--green)',
-            fontWeight: 600
-          }}>
+          <span style={{ fontFamily: "'Courier New', monospace", fontSize: '0.85rem', color: 'var(--success)', fontWeight: 600 }}>
             ACTIVE
           </span>
         </div>
@@ -65,81 +41,51 @@ export default function MCPPage() {
 
       {/* Connection Info */}
       <div style={{
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-        padding: '24px',
-        marginBottom: '24px'
+        background: 'var(--panel)', border: '1px solid var(--border)',
+        borderLeft: '3px solid var(--highlight)',
+        borderRadius: 'var(--radius)', padding: '28px', marginBottom: '32px',
       }}>
-        <h3 style={{
-          fontSize: '16px',
-          fontWeight: 700,
-          fontFamily: 'Rajdhani',
-          letterSpacing: '1px',
-          marginBottom: '16px'
-        }}>
+        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: '16px' }}>
           Connection Details
         </h3>
-        <div style={{ 
-          fontFamily: 'JetBrains Mono', 
-          fontSize: '13px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '8px'
-        }}>
+        <div style={{ fontFamily: "'Courier New', monospace", fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <div>
-            <span style={{ color: 'var(--text-dim)' }}>Endpoint: </span>
-            <span style={{ color: 'var(--cyan)' }}>https://mcp.sebhosting.com/mcp</span>
+            <span style={{ color: 'var(--accent)' }}>endpoint: </span>
+            <span style={{ color: 'var(--text)' }}>https://mcp.sebhosting.com/mcp</span>
           </div>
           <div>
-            <span style={{ color: 'var(--text-dim)' }}>Transport: </span>
-            <span style={{ color: 'var(--text-secondary)' }}>StreamableHTTP</span>
+            <span style={{ color: 'var(--accent)' }}>transport: </span>
+            <span style={{ color: 'var(--text)' }}>StreamableHTTP</span>
           </div>
           <div>
-            <span style={{ color: 'var(--text-dim)' }}>Auth: </span>
-            <span style={{ color: 'var(--text-secondary)' }}>Cloudflare Access (Service Token)</span>
+            <span style={{ color: 'var(--accent)' }}>auth: </span>
+            <span style={{ color: 'var(--text)' }}>Cloudflare Access (Service Token)</span>
           </div>
         </div>
       </div>
 
       {/* Available Tools */}
-      <h3 style={{
-        fontSize: '16px',
-        fontWeight: 700,
-        fontFamily: 'Rajdhani',
-        letterSpacing: '1px',
-        marginBottom: '16px'
-      }}>
+      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: '20px' }}>
         Available Tools ({tools.length})
       </h3>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-        gap: '12px'
-      }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
         {tools.map((tool, i) => (
           <div key={i} style={{
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border)',
-            borderRadius: '6px',
-            padding: '16px',
-          }}>
+            background: 'var(--panel)', border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)', padding: '20px',
+            transition: 'all 0.3s', cursor: 'pointer',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 10px 30px rgba(255,180,0,0.1)'; e.currentTarget.style.background = 'rgba(255,180,0,0.03)' }}
+          onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.background = 'var(--panel)' }}
+          >
             <div style={{
-              fontSize: '13px',
-              fontFamily: 'JetBrains Mono',
-              color: 'var(--cyan)',
-              fontWeight: 600,
-              marginBottom: '6px'
+              fontFamily: "'Courier New', monospace", fontSize: '0.9rem',
+              color: 'var(--accent)', fontWeight: 600, marginBottom: '8px',
             }}>
               {tool.name}
             </div>
-            <div style={{
-              fontSize: '12px',
-              fontFamily: 'JetBrains Mono',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.5
-            }}>
+            <div style={{ fontSize: '0.95rem', color: 'var(--muted)', lineHeight: 1.6 }}>
               {tool.desc}
             </div>
           </div>
@@ -148,30 +94,18 @@ export default function MCPPage() {
 
       {/* Usage Example */}
       <div style={{
-        marginTop: '32px',
-        background: 'var(--bg-surface)',
-        border: '1px solid var(--border)',
-        borderRadius: '8px',
-        padding: '24px'
+        marginTop: '40px', background: 'var(--panel)',
+        border: '1px solid var(--border)', borderLeft: '3px solid var(--highlight)',
+        borderRadius: 'var(--radius)', padding: '28px',
       }}>
-        <h3 style={{
-          fontSize: '16px',
-          fontWeight: 700,
-          fontFamily: 'Rajdhani',
-          letterSpacing: '1px',
-          marginBottom: '16px'
-        }}>
+        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text)', marginBottom: '16px' }}>
           Claude Code Configuration
         </h3>
         <pre style={{
-          fontFamily: 'JetBrains Mono',
-          fontSize: '12px',
-          color: 'var(--text-secondary)',
-          background: 'var(--bg-primary)',
-          padding: '16px',
-          borderRadius: '4px',
-          overflow: 'auto',
-          lineHeight: 1.6
+          fontFamily: "'Courier New', monospace", fontSize: '0.85rem',
+          color: 'var(--muted)', background: 'rgba(0,0,0,0.3)',
+          padding: '20px', borderRadius: 'var(--radius-sm)',
+          overflow: 'auto', lineHeight: 1.7,
         }}>
 {`~/.config/Claude/claude_desktop_config.json
 

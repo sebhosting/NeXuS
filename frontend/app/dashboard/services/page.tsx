@@ -2,11 +2,8 @@
 import { useEffect, useState } from 'react'
 
 type ServiceStatus = {
-  name: string
-  url: string
-  status: 'healthy' | 'error' | 'loading'
-  statusCode?: number
-  endpoint?: string
+  name: string; url: string; status: 'healthy' | 'error' | 'loading'
+  statusCode?: number; endpoint?: string
 }
 
 export default function ServicesPage() {
@@ -25,11 +22,7 @@ export default function ServicesPage() {
         services.map(async (service) => {
           try {
             const res = await fetch(`${service.url}${service.endpoint}`)
-            return {
-              ...service,
-              status: res.ok ? 'healthy' : 'error',
-              statusCode: res.status,
-            } as ServiceStatus
+            return { ...service, status: res.ok ? 'healthy' : 'error', statusCode: res.status } as ServiceStatus
           } catch {
             return { ...service, status: 'error', statusCode: 0 } as ServiceStatus
           }
@@ -44,71 +37,54 @@ export default function ServicesPage() {
   }, [])
 
   return (
-    <div style={{ padding: '32px', maxWidth: '1200px' }}>
+    <div>
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ 
-          fontSize: '28px', 
-          fontWeight: 700, 
-          fontFamily: 'Rajdhani',
-          letterSpacing: '2px',
-          color: 'var(--cyan)',
-          marginBottom: '8px'
-        }}>
-          SERVICES
+        <h1 style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--text)', letterSpacing: '-0.5px', marginBottom: '8px' }}>
+          Core <span style={{ color: 'var(--highlight)' }}>Services</span>
         </h1>
-        <p style={{ 
-          color: 'var(--text-secondary)', 
-          fontSize: '14px',
-          fontFamily: 'JetBrains Mono'
-        }}>
-          Manage and monitor all NeXuS microservices
+        <p style={{ color: 'var(--muted)', fontSize: '1rem' }}>
+          Monitor and manage all NeXuS microservices
         </p>
       </div>
 
       {/* Services Grid */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-        gap: '20px'
-      }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '24px' }}>
         {services.map(service => (
           <div key={service.name} style={{
-            background: 'var(--bg-surface)',
+            background: 'var(--panel)',
             border: '1px solid var(--border)',
-            borderRadius: '8px',
-            padding: '20px',
-            transition: 'all 0.2s',
-          }}>
+            borderRadius: 'var(--radius)',
+            padding: '28px',
+            transition: 'all 0.4s',
+            cursor: 'pointer',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.boxShadow = '0 15px 40px rgba(255, 180, 0, 0.15)'
+            e.currentTarget.style.background = 'rgba(255, 180, 0, 0.03)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.boxShadow = 'none'
+            e.currentTarget.style.background = 'var(--panel)'
+          }}
+          >
             {/* Status Indicator */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
               <div style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                background: service.status === 'healthy' ? 'var(--green)' : 
-                           service.status === 'error' ? 'var(--red)' : 'var(--yellow)',
-                boxShadow: service.status === 'healthy' ? '0 0 8px var(--green)' :
-                           service.status === 'error' ? '0 0 8px var(--red)' : 
-                           '0 0 8px var(--yellow)',
+                width: '10px', height: '10px', borderRadius: '50%',
+                background: service.status === 'healthy' ? 'var(--success)' :
+                  service.status === 'error' ? 'var(--red)' : 'var(--highlight)',
+                boxShadow: service.status === 'healthy' ? '0 0 8px var(--success)' :
+                  service.status === 'error' ? '0 0 8px var(--red)' : '0 0 8px var(--highlight)',
               }} />
-              <h3 style={{ 
-                fontSize: '18px', 
-                fontWeight: 700,
-                fontFamily: 'Rajdhani',
-                letterSpacing: '1px',
-                flex: 1
-              }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 700, color: 'var(--text)', flex: 1 }}>
                 {service.name}
               </h3>
-              {service.statusCode && (
+              {service.statusCode !== undefined && (
                 <span style={{
-                  fontSize: '11px',
-                  fontFamily: 'JetBrains Mono',
-                  color: 'var(--text-dim)',
-                  background: 'var(--bg-primary)',
-                  padding: '2px 6px',
-                  borderRadius: '3px'
+                  fontFamily: "'Courier New', monospace", fontSize: '0.8rem',
+                  color: 'var(--muted)', background: 'rgba(76, 201, 240, 0.08)',
+                  padding: '3px 8px', borderRadius: '6px',
                 }}>
                   {service.statusCode}
                 </span>
@@ -116,58 +92,37 @@ export default function ServicesPage() {
             </div>
 
             {/* URL */}
-            <div style={{ 
-              fontSize: '12px',
-              fontFamily: 'JetBrains Mono',
-              color: 'var(--text-secondary)',
-              marginBottom: '16px',
-              wordBreak: 'break-all'
+            <div style={{
+              fontFamily: "'Courier New', monospace", fontSize: '0.85rem',
+              color: 'var(--muted)', marginBottom: '20px', wordBreak: 'break-all',
             }}>
               {service.url}
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <a 
-                href={service.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <a href={service.url} target="_blank" rel="noopener noreferrer"
                 style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  background: 'var(--cyan)',
-                  color: 'var(--bg-primary)',
-                  border: 'none',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  fontFamily: 'Rajdhani',
-                  letterSpacing: '1px',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s'
+                  flex: 1, padding: '10px 16px',
+                  background: 'var(--accent-2)', color: '#04101d',
+                  border: 'none', borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.9rem', fontWeight: 700,
+                  textAlign: 'center', textDecoration: 'none',
+                  textTransform: 'uppercase', letterSpacing: '1px',
+                  transition: 'all 0.3s', cursor: 'pointer',
                 }}
               >
-                OPEN ↗
+                Open ↗
               </a>
-              <a 
-                href={`${service.url}${service.endpoint}`}
-                target="_blank" 
-                rel="noopener noreferrer"
+              <a href={`${service.url}${service.endpoint}`} target="_blank" rel="noopener noreferrer"
                 style={{
-                  padding: '8px 12px',
-                  background: 'var(--bg-hover)',
-                  color: 'var(--text-secondary)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  fontFamily: 'Rajdhani',
-                  letterSpacing: '1px',
-                  cursor: 'pointer',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s'
+                  padding: '10px 16px',
+                  background: 'rgba(255,255,255,0.03)',
+                  color: 'var(--muted)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.9rem', fontWeight: 600,
+                  textDecoration: 'none', textTransform: 'uppercase',
+                  letterSpacing: '1px', transition: 'all 0.3s',
                 }}
               >
                 API

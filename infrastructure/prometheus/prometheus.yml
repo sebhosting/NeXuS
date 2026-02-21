@@ -1,56 +1,117 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
-  scrape_timeout: 10s
+  external_labels:
+    cluster: 'nexus'
+    environment: 'production'
 
 scrape_configs:
   # Prometheus self-monitoring
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['nexus-prometheus:9090']
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
 
-  # NeXuS services
+  # Docker daemon metrics (if exposed)
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['host.docker.internal:9323']
+        labels:
+          service: 'docker-daemon'
+
+  # NeXuS API Gateway
   - job_name: 'nexus-api'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['nexus-api:4000']
+        labels:
+          service: 'api-gateway'
+          tier: 'core'
 
-  - job_name: 'nexus-cms'
+  # NeXuS Frontend
+  - job_name: 'nexus-frontend'
+    metrics_path: '/api/metrics'
     static_configs:
-      - targets: ['nexus-cms:7000']
+      - targets: ['nexus-frontend:3000']
+        labels:
+          service: 'frontend'
+          tier: 'web'
 
-  - job_name: 'nexus-cdn'
-    static_configs:
-      - targets: ['nexus-cdn:7001']
-
-  - job_name: 'nexus-cache'
-    static_configs:
-      - targets: ['nexus-cache:7002']
-
+  # Auth Service
   - job_name: 'nexus-auth'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['nexus-auth:6000']
+        labels:
+          service: 'auth'
+          tier: 'core'
 
+  # CMS Service
+  - job_name: 'nexus-cms'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['nexus-cms:7000']
+        labels:
+          service: 'cms'
+          tier: 'application'
+
+  # CDN Service
+  - job_name: 'nexus-cdn'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['nexus-cdn:7001']
+        labels:
+          service: 'cdn'
+          tier: 'application'
+
+  # Cache Service
+  - job_name: 'nexus-cache'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['nexus-cache:7002']
+        labels:
+          service: 'cache'
+          tier: 'application'
+
+  # WAF Service
   - job_name: 'nexus-waf'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['nexus-waf:7003']
+        labels:
+          service: 'waf'
+          tier: 'security'
 
+  # AI Gateway
   - job_name: 'nexus-ai'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['nexus-ai:5000']
+        labels:
+          service: 'ai-gateway'
+          tier: 'ai'
 
-  # Databases (if exporters installed)
-  - job_name: 'postgres'
+  # MCP Server
+  - job_name: 'nexus-mcp'
+    metrics_path: '/metrics'
     static_configs:
-      - targets: ['nexus-postgres:5432']
+      - targets: ['nexus-mcp:5001']
+        labels:
+          service: 'mcp-server'
+          tier: 'integration'
 
-  - job_name: 'redis'
-    static_configs:
-      - targets: ['nexus-redis:6379']
+  # PostgreSQL Exporter (if you want to add it later)
+  # - job_name: 'postgres'
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
 
-  - job_name: 'mongodb'
-    static_configs:
-      - targets: ['nexus-mongodb:27017']
+  # Redis Exporter (if you want to add it later)
+  # - job_name: 'redis'
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
 
-  - job_name: 'memcached'
-    static_configs:
-      - targets: ['nexus-memcached:11211']
+  # MongoDB Exporter (if you want to add it later)
+  # - job_name: 'mongodb'
+  #   static_configs:
+  #     - targets: ['mongodb-exporter:9216']

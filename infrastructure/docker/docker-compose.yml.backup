@@ -170,47 +170,34 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: nexus-prometheus
-    restart: unless-stopped
     volumes:
       - prometheus_data:/prometheus
       - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
-      - traefik-public
       - nexus-internal
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.nexus-prometheus.rule=Host(`prometheus.sebhosting.com`)"
-      - "traefik.http.routers.nexus-prometheus.entrypoints=websecure"
-      - "traefik.http.routers.nexus-prometheus.tls.certresolver=letsencrypt"
-      - "traefik.http.services.nexus-prometheus.loadbalancer.server.port=9090"
-      - "traefik.docker.network=traefik-public"
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
     container_name: nexus-grafana
     restart: unless-stopped
-    env_file: .env
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
-      GF_SERVER_ROOT_URL: https://nexus.sebhosting.com/grafana/
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
-      GF_DASHBOARDS_JSON_ENABLED: "true"
-      GF_DASHBOARDS_JSON_PATH: /var/lib/grafana/dashboards
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ../grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
     networks:
       - traefik-public
       - nexus-internal
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nexus-grafana.rule=Host(`nexus.sebhosting.com`) && PathPrefix(`/grafana`)"
+      - "traefik.http.routers.nexus-grafana.rule=Host(`grafana.sebhosting.com`)"
       - "traefik.http.routers.nexus-grafana.entrypoints=websecure"
       - "traefik.http.routers.nexus-grafana.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.nexus-grafana.priority=200"
       - "traefik.http.services.nexus-grafana.loadbalancer.server.port=3000"
       - "traefik.docker.network=traefik-public"
 

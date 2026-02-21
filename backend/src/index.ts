@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { execSync } from 'child_process'
 import * as fs from 'fs'
+import { dnsRouter } from './routes/dns'
 
 dotenv.config({ quiet: true } as any)
 
@@ -17,6 +18,9 @@ app.use(cors({
   credentials: true,
 }))
 app.use(express.json())
+
+// ── DNS (Cloudflare proxy) ───────────────────────────────────
+app.use('/dns', dnsRouter)
 
 // ── ROOT ──────────────────────────────────────────────────────
 app.get('/', (_req, res) => {
