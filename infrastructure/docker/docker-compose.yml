@@ -167,6 +167,51 @@ services:
       - "traefik.http.services.nexus-ai.loadbalancer.server.port=5000"
       - "traefik.docker.network=traefik-public"
 
+  backup-service:
+    build: ../../services/backup-service
+    container_name: nexus-backup
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+      - mongodb
+    volumes:
+      - backup_data:/data/backups
+      - cdn_data:/data/cdn:ro
+      - redis_data:/data/redis:ro
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-backup.rule=Host(`backup.sebhosting.com`)"
+      - "traefik.http.routers.nexus-backup.entrypoints=websecure"
+      - "traefik.http.routers.nexus-backup.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-backup.loadbalancer.server.port=7004"
+      - "traefik.docker.network=traefik-public"
+
+  sites-service:
+    build: ../../services/sites-service
+    container_name: nexus-sites
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      - postgres
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - sites_build:/data/sites
+    networks:
+      - traefik-public
+      - nexus-internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus-sites.rule=Host(`sites-api.sebhosting.com`)"
+      - "traefik.http.routers.nexus-sites.entrypoints=websecure"
+      - "traefik.http.routers.nexus-sites.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nexus-sites.loadbalancer.server.port=7005"
+      - "traefik.docker.network=traefik-public"
+
   prometheus:
     image: prom/prometheus:latest
     container_name: nexus-prometheus
@@ -268,7 +313,9 @@ services:
       - nexus-internal
 
 volumes:
+  backup_data:
   cdn_data:
+  sites_build:
   postgres_data:
   mongodb_data:
   redis_data:

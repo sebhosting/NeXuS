@@ -35,6 +35,15 @@ async function initDB() {
       created_at TIMESTAMP DEFAULT NOW()
     )
   `)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ai_config (
+      key VARCHAR(100) PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TIMESTAMP DEFAULT NOW()
+    );
+    INSERT INTO ai_config (key, value) VALUES ('default_model', 'claude-sonnet-4-5-20250514') ON CONFLICT DO NOTHING;
+    INSERT INTO ai_config (key, value) VALUES ('max_tokens', '4096') ON CONFLICT DO NOTHING;
+  `)
   console.log('✓ AI Gateway schema ready')
 }
 
@@ -110,6 +119,53 @@ app.get('/stats', async (_req, res) => {
   res.json({ period: '24h', models: result.rows })
 })
 
+// Daily token usage history (30 days)
+app.get('/stats/history', async (_req, res) => {
+  const result = await pool.query(`
+    SELECT DATE(created_at) as date, COUNT(*) as requests,
+      COALESCE(SUM(prompt_tokens),0) as input_tokens,
+      COALESCE(SUM(completion_tokens),0) as output_tokens,
+      COALESCE(SUM(total_tokens),0) as total_tokens,
+      COALESCE(AVG(latency_ms),0)::integer as avg_latency
+    FROM ai_requests WHERE created_at > NOW() - INTERVAL '30 days'
+    GROUP BY DATE(created_at) ORDER BY date DESC
+  `)
+  res.json({ history: result.rows })
+})
+
+// Paginated recent requests
+app.get('/stats/requests', async (req: Request, res: Response) => {
+  const limit = parseInt(req.query.limit as string) || 50
+  const offset = parseInt(req.query.offset as string) || 0
+  const result = await pool.query(`
+    SELECT id, model, prompt_tokens, completion_tokens, total_tokens, latency_ms, status, error, created_at
+    FROM ai_requests ORDER BY created_at DESC LIMIT $1 OFFSET $2
+  `, [limit, offset])
+  res.json({ requests: result.rows })
+})
+
+// Get model configuration
+app.get('/config', async (_req, res) => {
+  const result = await pool.query(`SELECT key, value FROM ai_config`)
+  const config: Record<string, string> = {}
+  result.rows.forEach((row: { key: string; value: string }) => {
+    config[row.key] = row.value
+  })
+  res.json(config)
+})
+
+// Update model configuration
+app.put('/config', async (req: Request, res: Response) => {
+  const { default_model, max_tokens } = req.body
+  if (default_model) {
+    await pool.query(`UPDATE ai_config SET value=$2, updated_at=NOW() WHERE key=$1`, ['default_model', default_model])
+  }
+  if (max_tokens) {
+    await pool.query(`UPDATE ai_config SET value=$2, updated_at=NOW() WHERE key=$1`, ['max_tokens', String(max_tokens)])
+  }
+  res.json({ success: true })
+})
+
 initDB().then(() => {
   app.listen(PORT, () => console.log(`✓ AI Gateway on port ${PORT}`))
 })
@@ -124,6 +180,10 @@ app.get('/', (_req, res) => {
     endpoints: {
       messages: 'POST /v1/messages (Anthropic proxy)',
       stats: 'GET /stats (24h usage)',
+      statsHistory: 'GET /stats/history (30-day daily breakdown)',
+      statsRequests: 'GET /stats/requests (paginated request log)',
+      config: 'GET /config (model configuration)',
+      configUpdate: 'PUT /config (update model configuration)',
       health: 'GET /health'
     }
   })

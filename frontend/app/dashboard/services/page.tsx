@@ -1,19 +1,22 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 type ServiceStatus = {
   name: string; url: string; status: 'healthy' | 'error' | 'loading'
-  statusCode?: number; endpoint?: string
+  statusCode?: number; endpoint?: string; manage?: string
 }
 
 export default function ServicesPage() {
   const [services, setServices] = useState<ServiceStatus[]>([
-    { name: 'CMS', url: 'https://cms.sebhosting.com', status: 'loading', endpoint: '/pages' },
-    { name: 'CDN', url: 'https://cdn.sebhosting.com', status: 'loading', endpoint: '/files' },
-    { name: 'Cache', url: 'https://cache.sebhosting.com', status: 'loading', endpoint: '/stats' },
-    { name: 'Auth', url: 'https://auth.sebhosting.com', status: 'loading', endpoint: '/health' },
-    { name: 'WAF', url: 'https://waf.sebhosting.com', status: 'loading', endpoint: '/health' },
-    { name: 'AI Gateway', url: 'https://ai-gateway.sebhosting.com', status: 'loading', endpoint: '/stats' },
+    { name: 'CMS', url: 'https://cms.sebhosting.com', status: 'loading', endpoint: '/pages', manage: '/dashboard/cms' },
+    { name: 'CDN', url: 'https://cdn.sebhosting.com', status: 'loading', endpoint: '/files', manage: '/dashboard/cdn' },
+    { name: 'Cache', url: 'https://cache.sebhosting.com', status: 'loading', endpoint: '/stats', manage: '/dashboard/cache' },
+    { name: 'Auth', url: 'https://auth.sebhosting.com', status: 'loading', endpoint: '/health', manage: '/dashboard/auth' },
+    { name: 'WAF', url: 'https://waf.sebhosting.com', status: 'loading', endpoint: '/health', manage: '/dashboard/waf' },
+    { name: 'AI Gateway', url: 'https://ai-gateway.sebhosting.com', status: 'loading', endpoint: '/stats', manage: '/dashboard/ai' },
+    { name: 'Backup', url: 'https://backup.sebhosting.com', status: 'loading', endpoint: '/health', manage: '/dashboard/backups' },
+    { name: 'Sites', url: 'https://sites-api.sebhosting.com', status: 'loading', endpoint: '/health', manage: '/dashboard/sites' },
   ])
 
   useEffect(() => {
@@ -101,15 +104,30 @@ export default function ServicesPage() {
 
             {/* Actions */}
             <div style={{ display: 'flex', gap: '10px' }}>
+              {service.manage && (
+                <Link href={service.manage}
+                  style={{
+                    flex: 1, padding: '10px 16px',
+                    background: 'var(--accent-2)', color: '#04101d',
+                    border: 'none', borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.9rem', fontWeight: 700,
+                    textAlign: 'center', textDecoration: 'none',
+                    textTransform: 'uppercase', letterSpacing: '1px',
+                    transition: 'all 0.3s', cursor: 'pointer',
+                  }}
+                >
+                  Manage
+                </Link>
+              )}
               <a href={service.url} target="_blank" rel="noopener noreferrer"
                 style={{
-                  flex: 1, padding: '10px 16px',
-                  background: 'var(--accent-2)', color: '#04101d',
-                  border: 'none', borderRadius: 'var(--radius-sm)',
-                  fontSize: '0.9rem', fontWeight: 700,
-                  textAlign: 'center', textDecoration: 'none',
-                  textTransform: 'uppercase', letterSpacing: '1px',
-                  transition: 'all 0.3s', cursor: 'pointer',
+                  padding: '10px 16px',
+                  background: 'rgba(255,255,255,0.03)',
+                  color: 'var(--muted)', border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.9rem', fontWeight: 600,
+                  textDecoration: 'none', textTransform: 'uppercase',
+                  letterSpacing: '1px', transition: 'all 0.3s',
                 }}
               >
                 Open ↗

@@ -22,6 +22,11 @@ app.get('/health', (_req, res) => {
 
 // ── PAGES ────────────────────────────────────────────────────
 
+function mapId(doc: any) {
+  const { _id, ...rest } = doc
+  return { id: _id.toString(), ...rest }
+}
+
 app.get('/pages', async (req, res) => {
   const db = client.db('nexus')
   const pages = await db.collection('pages')
@@ -29,14 +34,14 @@ app.get('/pages', async (req, res) => {
     .sort({ created_at: -1 })
     .limit(100)
     .toArray()
-  res.json(pages)
+  res.json(pages.map(mapId))
 })
 
 app.get('/pages/:id', async (req, res) => {
   const db = client.db('nexus')
   const page = await db.collection('pages').findOne({ _id: new ObjectId(req.params.id) })
   if (!page) return res.status(404).json({ error: 'Page not found' })
-  res.json(page)
+  res.json(mapId(page))
 })
 
 app.post('/pages', async (req, res) => {
@@ -50,7 +55,7 @@ app.post('/pages', async (req, res) => {
     created_at: new Date(),
     updated_at: new Date(),
   })
-  res.json({ id: result.insertedId })
+  res.json({ id: result.insertedId.toString() })
 })
 
 app.put('/pages/:id', async (req, res) => {
@@ -78,7 +83,14 @@ app.get('/posts', async (req, res) => {
     .sort({ created_at: -1 })
     .limit(100)
     .toArray()
-  res.json(posts)
+  res.json(posts.map(mapId))
+})
+
+app.get('/posts/:id', async (req, res) => {
+  const db = client.db('nexus')
+  const post = await db.collection('posts').findOne({ _id: new ObjectId(req.params.id) })
+  if (!post) return res.status(404).json({ error: 'Post not found' })
+  res.json(mapId(post))
 })
 
 app.post('/posts', async (req, res) => {
@@ -93,7 +105,23 @@ app.post('/posts', async (req, res) => {
     created_at: new Date(),
     updated_at: new Date(),
   })
-  res.json({ id: result.insertedId })
+  res.json({ id: result.insertedId.toString() })
+})
+
+app.put('/posts/:id', async (req, res) => {
+  const { title, slug, content, published, tags } = req.body
+  const db = client.db('nexus')
+  await db.collection('posts').updateOne(
+    { _id: new ObjectId(req.params.id) },
+    { $set: { title, slug, content, published, tags, updated_at: new Date() } }
+  )
+  res.json({ success: true })
+})
+
+app.delete('/posts/:id', async (req, res) => {
+  const db = client.db('nexus')
+  await db.collection('posts').deleteOne({ _id: new ObjectId(req.params.id) })
+  res.json({ success: true })
 })
 
 client.connect().then(() => {
@@ -109,7 +137,7 @@ app.get('/', (_req, res) => {
     status: 'healthy',
     endpoints: {
       pages: 'GET /pages, POST /pages, GET /pages/:id, PUT /pages/:id, DELETE /pages/:id',
-      posts: 'GET /posts, POST /posts',
+      posts: 'GET /posts, POST /posts, GET /posts/:id, PUT /posts/:id, DELETE /posts/:id',
       health: 'GET /health'
     }
   })

@@ -8,16 +8,21 @@ const NAV = [
   { label: 'Services',    href: '/dashboard/services',   icon: '⬡' },
   { label: 'DNS',         href: '/dashboard/dns',        icon: '⬡' },
   { label: 'MCP Server',  href: '/dashboard/mcp',        icon: '⬡' },
-  { label: 'Grafana',     href: '/dashboard/grafana',    icon: '📊' },
 ]
 
-const SERVICES = [
-  { label: 'CMS',         url: 'https://cms.sebhosting.com',        icon: '⬡' },
-  { label: 'CDN',         url: 'https://cdn.sebhosting.com',        icon: '⬡' },
-  { label: 'Cache',       url: 'https://cache.sebhosting.com',      icon: '⬡' },
-  { label: 'Auth',        url: 'https://auth.sebhosting.com',       icon: '⬡' },
-  { label: 'WAF',         url: 'https://waf.sebhosting.com',        icon: '⬡' },
-  { label: 'AI Gateway',  url: 'https://ai-gateway.sebhosting.com', icon: '⬡' },
+const MANAGE = [
+  { label: 'CMS',         href: '/dashboard/cms',        icon: '⬡' },
+  { label: 'CDN',         href: '/dashboard/cdn',        icon: '⬡' },
+  { label: 'Cache',       href: '/dashboard/cache',      icon: '⬡' },
+  { label: 'Auth',        href: '/dashboard/auth',       icon: '⬡' },
+  { label: 'WAF',         href: '/dashboard/waf',        icon: '⬡' },
+  { label: 'AI Gateway',  href: '/dashboard/ai',         icon: '⬡' },
+  { label: 'Backups',     href: '/dashboard/backups',    icon: '⬡' },
+  { label: 'Sites',       href: '/dashboard/sites',      icon: '⬡' },
+]
+
+const SETTINGS = [
+  { label: 'Settings',    href: '/dashboard/settings',   icon: '⬡' },
 ]
 
 const SITES = [
@@ -137,8 +142,11 @@ export default function Sidebar() {
           <Section label="Navigation" />
           {NAV.map(n => <NavItem key={n.href} {...n} />)}
 
-          <Section label="Services" />
-          {SERVICES.map(s => <ExtItem key={s.url} {...s} dot="green" />)}
+          <Section label="Manage" />
+          {MANAGE.map(n => <NavItem key={n.href} {...n} />)}
+
+          <Section label="Settings" />
+          {SETTINGS.map(n => <NavItem key={n.href} {...n} />)}
 
           <Section label="Sites" />
           {SITES.map(s => <ExtItem key={s.url} {...s} dot="green" />)}

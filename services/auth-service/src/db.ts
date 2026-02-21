@@ -99,4 +99,36 @@ export const db = {
   async deleteAllRefreshTokens(userId: string) {
     await pool.query('DELETE FROM refresh_tokens WHERE user_id=$1', [userId])
   },
+
+  async listUsers() {
+    const r = await pool.query(
+      'SELECT id, username, email, role, created_at, last_login, is_active FROM users ORDER BY created_at DESC'
+    )
+    return r.rows
+  },
+
+  async updateUserRole(id: string, role: string) {
+    await pool.query('UPDATE users SET role=$2 WHERE id=$1', [id, role])
+  },
+
+  async updateUserActive(id: string, active: boolean) {
+    await pool.query('UPDATE users SET is_active=$2 WHERE id=$1', [id, active])
+  },
+
+  async deleteUser(id: string) {
+    await pool.query('DELETE FROM users WHERE id=$1', [id])
+  },
+
+  async updatePassword(id: string, hash: string) {
+    await pool.query('UPDATE users SET password=$2 WHERE id=$1', [id, hash])
+  },
+
+  async listActiveSessions() {
+    const r = await pool.query(
+      `SELECT rt.id, rt.user_id, u.username, rt.created_at, rt.expires_at
+       FROM refresh_tokens rt JOIN users u ON u.id = rt.user_id
+       WHERE rt.expires_at > NOW() ORDER BY rt.created_at DESC`
+    )
+    return r.rows
+  },
 }
