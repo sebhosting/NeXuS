@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"       # Node.js packages
+    directory: "/"                 # Where your package.json is
+    schedule:
+      interval: "weekly"           # Check once a week
+    commit-message:
+      prefix: "chore(deps)"        # Optional, prefix your commit messages
+    open-pull-requests-limit: 5    # Prevent spam of too many PRs
+    ignore:
+      - dependency-name: "some-old-lib"
+        versions: ["<2.0.0"]       # Optional: ignore certain versions
+
+  - package-ecosystem: "github-actions"  # Keep your Actions updated
+    directory: "/"                       # Root directory
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci(actions)"
