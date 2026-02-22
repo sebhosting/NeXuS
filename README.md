@@ -475,6 +475,6 @@ MIT License. See [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  Built by <strong>SEB</strong><br/>
+  Built by <strong><a href="https://sebhosting.com">SEBHosting</a></strong><br/>
   Powered by Docker, TypeScript, Next.js, Express, PostgreSQL, MongoDB, Redis, Traefik, Prometheus, Grafana, and Claude AI
 </p>
