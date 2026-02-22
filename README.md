@@ -1,14 +1,14 @@
 <p align="center">
   <h1 align="center">NeXuS</h1>
   <p align="center">
-    <strong>Self-hosted infrastructure platform with 11 microservices, AI integration, and Docker site deployment</strong>
+    <strong>Self-hosted infrastructure management platform with 11 microservices, AI integration, and Docker site deployment</strong>
   </p>
   <p align="center">
+    <a href="https://nexus-docs.sebhosting.com">Documentation</a> &bull;
+    <a href="#live-demo">Live Demo</a> &bull;
     <a href="#quick-start">Quick Start</a> &bull;
     <a href="#architecture">Architecture</a> &bull;
     <a href="#services">Services</a> &bull;
-    <a href="#dashboard">Dashboard</a> &bull;
-    <a href="#site-deployment">Site Deployment</a> &bull;
     <a href="#mcp-integration">MCP Integration</a>
   </p>
   <p align="center">
@@ -31,17 +31,29 @@ NeXuS is a **production-grade, self-hosted infrastructure management platform**.
 
 ---
 
+## Live Demo
+
+Try NeXuS without installing anything:
+
+**[https://nexus.sebhosting.com](https://nexus.sebhosting.com)**
+
+Register for a **free 7-day trial** with full read+write access to all features. No credit card required.
+
+> **Note:** The demo runs on a shared instance. Please be respectful of other users' data.
+
+---
+
 ## Architecture
 
 ```
                          ┌──────────────────────┐
-                         │   Cloudflare / DNS    │
+                         │   Cloudflare / DNS   │
                          └──────────┬───────────┘
                                     │
                          ┌──────────▼───────────┐
-                         │       Traefik         │
-                         │   Reverse Proxy       │
-                         │   Let's Encrypt TLS   │
+                         │       Traefik        │
+                         │   Reverse Proxy      │
+                         │   Let's Encrypt TLS  │
                          └──────────┬───────────┘
                                     │
           ┌─────────────────────────┼─────────────────────────┐
@@ -82,8 +94,8 @@ NeXuS is a **production-grade, self-hosted infrastructure management platform**.
 ```
 
 **Two isolated networks:**
-- `traefik-public` -- external, Traefik-routed, TLS-terminated
-- `nexus-internal` -- isolated bridge, databases only, no external access
+- `traefik-public` — external, Traefik-routed, TLS-terminated
+- `nexus-internal` — isolated bridge, databases only, no external access
 
 ---
 
@@ -91,19 +103,19 @@ NeXuS is a **production-grade, self-hosted infrastructure management platform**.
 
 ### Application Services
 
-| Service | Port | Domain | Stack | Description |
-|---------|------|--------|-------|-------------|
-| **Frontend** | 3000 | `nexus.sebhosting.com` | Next.js 16, React 19 | Dashboard with 14 management pages |
-| **API Gateway** | 4000 | `api.sebhosting.com` | Express 5 | Docker stats, container monitoring, system metrics |
-| **Auth** | 6000 | `auth.sebhosting.com` | Express 5, JWT, bcrypt | Registration, login, refresh tokens, user management |
-| **CMS** | 7000 | `cms.sebhosting.com` | Express 5, MongoDB | Headless CMS -- pages and posts with CRUD |
-| **CDN** | 7001 | `cdn.sebhosting.com` | Express 5, Multer | File uploads, static asset hosting, storage stats |
-| **Cache** | 7002 | `cache.sebhosting.com` | Express 5, Redis | Key-value management, flush, TTL, hit/miss stats |
-| **WAF** | 7003 | `waf.sebhosting.com` | Express 5, PostgreSQL | IP rules, rate limiting, blocked request logging |
-| **Backup** | 7004 | `backup.sebhosting.com` | Express 5, pg_dump, mongodump | Scheduled backups for PostgreSQL, MongoDB, Redis, CDN |
-| **Sites** | 7005 | `sites-api.sebhosting.com` | Express 5, Dockerode | Deploy WordPress, Drupal, Node.js, Vite as Docker containers |
-| **AI Gateway** | 5000 | `ai-gateway.sebhosting.com` | Express 5 | Anthropic API proxy with usage tracking and config |
-| **MCP Server** | 5001 | `mcp.sebhosting.com` | MCP SDK, Express | 50+ tools for Claude Code infrastructure management |
+| Service | Port | Subdomain | Stack | Description |
+|---------|------|-----------|-------|-------------|
+| **Frontend** | 3000 | `nexus.your_domain.com` | Next.js 16, React 19 | Dashboard with 14 management pages |
+| **API Gateway** | 4000 | `api.your_domain.com` | Express 5 | Docker stats, container monitoring, system metrics |
+| **Auth** | 6000 | `auth.your_domain.com` | Express 5, JWT, bcrypt | Registration, login, refresh tokens, user management |
+| **CMS** | 7000 | `cms.your_domain.com` | Express 5, MongoDB | Headless CMS — pages and posts with CRUD |
+| **CDN** | 7001 | `cdn.your_domain.com` | Express 5, Multer | File uploads, static asset hosting, storage stats |
+| **Cache** | 7002 | `cache.your_domain.com` | Express 5, Redis | Key-value management, flush, TTL, hit/miss stats |
+| **WAF** | 7003 | `waf.your_domain.com` | Express 5, PostgreSQL | IP rules, rate limiting, blocked request logging |
+| **Backup** | 7004 | `backup.your_domain.com` | Express 5, pg_dump, mongodump | Scheduled backups for PostgreSQL, MongoDB, Redis, CDN |
+| **Sites** | 7005 | `sites-api.your_domain.com` | Express 5, Dockerode | Deploy WordPress, Drupal, Node.js, Vite via Docker |
+| **AI Gateway** | 5000 | `ai-gateway.your_domain.com` | Express 5 | Anthropic API proxy with usage tracking and config |
+| **MCP Server** | 5001 | `mcp.your_domain.com` | MCP SDK, Express | Claude Code infrastructure management tools |
 
 ### Databases
 
@@ -116,55 +128,39 @@ NeXuS is a **production-grade, self-hosted infrastructure management platform**.
 
 ### Monitoring
 
-| Tool | Domain | Purpose |
-|------|--------|---------|
-| **Prometheus** | `prometheus.sebhosting.com` | Metrics scraping (15s interval) from all services |
-| **Grafana** | `grafana.sebhosting.com` | Dashboards -- containers, APIs, databases, cache |
+| Tool | Subdomain | Purpose |
+|------|-----------|---------|
+| **Prometheus** | `prometheus.your_domain.com` | Metrics scraping (15s interval) from all services |
+| **Grafana** | `grafana.your_domain.com` | Dashboards for containers, APIs, databases, cache |
 
 ---
 
 ## Dashboard
 
-The frontend provides **14 management pages**, each with full CRUD, real-time stats, and a consistent dark-themed UI.
-
-### Navigation
-
-```
-NAVIGATION          MANAGE              SETTINGS
-  Dashboard           CMS                 Settings
-  Services            CDN
-  DNS                 Cache             EXTERNAL
-  MCP Server          Auth                Grafana
-                      WAF                 Prometheus
-                      AI Gateway          Traefik
-                      Backups
-                      Sites
-```
-
-### Pages
+14 management pages with full CRUD, real-time stats, and a dark-themed UI:
 
 | Page | What it does |
 |------|-------------|
-| **Dashboard** | System overview, container health, resource usage |
-| **Services** | Health monitoring for all 11+ services with status LEDs |
-| **DNS** | Cloudflare DNS record management (CRUD) |
-| **MCP Server** | Claude MCP tool browser and testing |
-| **CMS** | Pages & Posts management with publish/draft, markdown content |
+| **Dashboard** | System overview — container health, CPU, memory, load average |
+| **Sites** | Deploy WordPress, Drupal, Node.js, or Vite sites as Docker containers |
+| **CMS** | Pages & posts management with publish/draft and markdown content |
 | **CDN** | File upload, storage stats, file browser with preview |
-| **Cache** | Redis key browser, set/get/delete, flush, hit ratio stats |
-| **Auth** | User management, role assignment, session viewer, password change |
+| **DNS** | Cloudflare DNS record management (A, AAAA, CNAME, MX, TXT) |
+| **Auth** | User management, role assignment, pending approvals, sessions |
 | **WAF** | IP block/allow rules, rate limits, blocked request log |
-| **AI Gateway** | Usage stats, request history, model configuration |
-| **Backups** | Manual/scheduled backups, restore, retention policies |
-| **Sites** | Docker site deployment -- WordPress, Drupal, Node.js, Vite |
-| **Settings** | Service health, user profile, system info |
+| **Cache** | Redis key browser, set/get/delete, flush, hit ratio stats |
+| **Services** | Health monitoring for all services with live status indicators |
+| **AI Gateway** | AI API usage stats, request history, model configuration |
+| **Backups** | Manual/scheduled backups, restore, cron scheduling |
+| **MCP Server** | Claude MCP tool browser and testing |
+| **Settings** | Service health dashboard, user profile, security settings |
 | **Grafana** | Metrics dashboards (external link) |
 
 ---
 
 ## Site Deployment
 
-The Sites service is a **Docker-based site deployment platform**. It creates and manages Docker containers via the Docker socket, with Traefik handling automatic TLS and routing.
+The Sites service is a **Docker-based site deployment platform**. It creates and manages containers via the Docker socket, with Traefik handling automatic TLS and routing.
 
 ### Supported Site Types
 
@@ -172,42 +168,17 @@ The Sites service is a **Docker-based site deployment platform**. It creates and
 |------|-------------------|-------|
 | **WordPress** | App container + dedicated MariaDB | `wordpress:latest` + `mariadb:11` |
 | **Drupal** | App container + dedicated MariaDB | `drupal:latest` + `mariadb:11` |
-| **Node.js** | Built from your code (ZIP or git clone) | Auto-generated or your Dockerfile |
+| **Node.js** | Built from your code (ZIP or git clone) | Auto-generated Dockerfile |
 | **Vite / Static** | Nginx serving your static files | `nginx:alpine` |
 
 ### How it works
 
-```
-1. Create site (pick type, name, slug, optional custom domain)
-          │
-2. For WordPress/Drupal:
-   ├── Pull images (wordpress + mariadb)
-   ├── Create private bridge network
-   ├── Create MariaDB container with generated credentials
-   ├── Create app container with Traefik labels
-   └── Site available at {slug}.sebhosting.com
+1. Create site from dashboard (pick type, name, slug)
+2. NeXuS pulls images, creates containers, sets up networking
+3. Traefik auto-issues TLS certificate via Let's Encrypt
+4. Site live at `{slug}.your_domain.com`
 
-3. For Node.js:
-   ├── Upload ZIP or provide git URL
-   ├── Auto-detect or generate Dockerfile
-   ├── Build Docker image from your code
-   ├── Create container with Traefik labels
-   └── App running at {slug}.sebhosting.com
-
-4. For Vite/Static:
-   ├── Upload ZIP of built files
-   ├── Build nginx image with files baked in
-   ├── Create container with Traefik labels
-   └── Site served at {slug}.sebhosting.com
-```
-
-### Management
-
-From the dashboard you can **start**, **stop**, **restart**, **view logs**, **redeploy**, and **delete** any site. Each site gets its own containers, volumes, and network -- fully isolated.
-
-### DNS
-
-Set up a **wildcard DNS record** (`*.sebhosting.com`) to avoid adding A records per site. Traefik handles TLS certificates automatically via Let's Encrypt.
+Each site gets its own containers, volumes, and network — fully isolated. Start, stop, restart, view logs, redeploy, and delete from the dashboard.
 
 ---
 
@@ -222,7 +193,7 @@ Add to your Claude Code MCP config:
 ```json
 {
   "nexus-mcp": {
-    "url": "https://mcp.sebhosting.com/mcp",
+    "url": "https://mcp.your_domain.com/mcp",
     "headers": {
       "cf-access-client-id": "your-service-token-id",
       "cf-access-client-secret": "your-service-token-secret"
@@ -241,8 +212,6 @@ Add to your Claude Code MCP config:
 | **Cache** | `nexus_cache_stats`, `nexus_cache_get`, `nexus_cache_set`, `nexus_cache_flush` |
 | **CMS** | `nexus_list_pages`, `nexus_create_page`, `nexus_update_page`, `nexus_delete_page` |
 
-### Example
-
 Ask Claude Code: *"Check if all NeXuS services are healthy"* and it will use `nexus_health_check` to ping every service and report status.
 
 ---
@@ -258,8 +227,8 @@ Ask Claude Code: *"Check if all NeXuS services are healthy"* and it will use `ne
 ### 1. Clone
 
 ```bash
-git clone https://github.com/yourusername/nexus.git
-cd nexus
+git clone https://github.com/sebhosting/NeXuS.git
+cd NeXuS
 ```
 
 ### 2. Configure
@@ -269,7 +238,7 @@ cp .env.example infrastructure/docker/.env
 nano infrastructure/docker/.env
 ```
 
-Required environment variables:
+Required variables:
 
 ```env
 # Databases
@@ -288,94 +257,41 @@ ANTHROPIC_API_KEY=sk-ant-...
 OPENAI_API_KEY=sk-...
 ```
 
-### 3. Deploy
+### 3. Update domains
+
+Find and replace `your_domain.com` with your actual domain in `infrastructure/docker/docker-compose.yml`.
+
+### 4. Deploy
 
 ```bash
 cd infrastructure/docker
 docker compose up -d --build
 ```
 
-### 4. DNS
+### 5. DNS
 
-Point these A records to your server:
-
-```
-nexus.sebhosting.com        → your-server-ip
-api.sebhosting.com          → your-server-ip
-auth.sebhosting.com         → your-server-ip
-cms.sebhosting.com          → your-server-ip
-cdn.sebhosting.com          → your-server-ip
-cache.sebhosting.com        → your-server-ip
-waf.sebhosting.com          → your-server-ip
-ai-gateway.sebhosting.com   → your-server-ip
-backup.sebhosting.com       → your-server-ip
-sites-api.sebhosting.com    → your-server-ip
-grafana.sebhosting.com      → your-server-ip
-prometheus.sebhosting.com   → your-server-ip
-mcp.sebhosting.com          → your-server-ip
-*.sebhosting.com            → your-server-ip  (wildcard for deployed sites)
-```
-
-### 5. First Login
-
-Navigate to `https://nexus.sebhosting.com`. The first registered user automatically becomes **admin**.
-
----
-
-## Project Structure
+Point these A records to your server IP:
 
 ```
-nexus/
-├── frontend/                    # Next.js 16 dashboard
-│   ├── app/
-│   │   ├── dashboard/
-│   │   │   ├── ai/             # AI Gateway management
-│   │   │   ├── auth/           # User & session management
-│   │   │   ├── backups/        # Backup & restore
-│   │   │   ├── cache/          # Redis key browser
-│   │   │   ├── cdn/            # File uploads & storage
-│   │   │   ├── cms/            # Pages & posts editor
-│   │   │   ├── dns/            # DNS record management
-│   │   │   ├── grafana/        # Metrics dashboards
-│   │   │   ├── mcp/            # MCP tool browser
-│   │   │   ├── services/       # Service health monitor
-│   │   │   ├── settings/       # System settings
-│   │   │   ├── sites/          # Docker site deployer
-│   │   │   └── waf/            # Firewall rules & logs
-│   │   └── login/              # Authentication
-│   ├── components/
-│   │   └── Sidebar.tsx         # Navigation sidebar
-│   └── lib/
-│       └── AuthContext.tsx      # JWT auth context
-│
-├── backend/                     # API Gateway (Express 5)
-│   └── src/index.ts            # Docker stats, health, metrics
-│
-├── services/
-│   ├── auth-service/           # JWT, bcrypt, refresh tokens, RBAC
-│   ├── cms-service/            # MongoDB CRUD for pages & posts
-│   ├── cdn-service/            # File storage, static site hosting
-│   ├── cache-service/          # Redis management API
-│   ├── waf-service/            # IP rules, rate limits, block log
-│   ├── ai-gateway/             # Anthropic proxy, usage tracking
-│   ├── backup-service/         # pg_dump, mongodump, cron scheduling
-│   ├── sites-service/          # Docker container orchestration
-│   └── mcp-server/             # Claude MCP tool server
-│
-├── infrastructure/
-│   ├── docker/
-│   │   ├── docker-compose.yml  # All 17 containers defined here
-│   │   └── .env                # Environment secrets
-│   ├── prometheus/
-│   │   └── prometheus.yml      # Scrape configs for all services
-│   └── grafana/
-│       └── dashboards/         # Pre-configured dashboards
-│
-├── .env.example                # Environment template
-├── package.json                # Monorepo workspace config
-├── Makefile                    # Build automation
-└── tsconfig.json               # TypeScript config
+nexus.your_domain.com         → your-server-ip
+api.your_domain.com           → your-server-ip
+auth.your_domain.com          → your-server-ip
+cms.your_domain.com           → your-server-ip
+cdn.your_domain.com           → your-server-ip
+cache.your_domain.com         → your-server-ip
+waf.your_domain.com           → your-server-ip
+ai-gateway.your_domain.com    → your-server-ip
+backup.your_domain.com        → your-server-ip
+sites-api.your_domain.com     → your-server-ip
+grafana.your_domain.com       → your-server-ip
+prometheus.your_domain.com    → your-server-ip
+mcp.your_domain.com           → your-server-ip
+*.your_domain.com             → your-server-ip  (wildcard for deployed sites)
 ```
+
+### 6. First Login
+
+Navigate to `https://nexus.your_domain.com`. The first registered user automatically becomes **admin**.
 
 ---
 
@@ -383,8 +299,8 @@ nexus/
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | Next.js 16, React 19, TypeScript, TailwindCSS 4 |
-| **Backend** | Express 5, TypeScript, Node.js 25 |
+| **Frontend** | Next.js 16, React 19, TypeScript 5, TailwindCSS 4 |
+| **Backend** | Express 5, TypeScript 5, Node.js 25 |
 | **Databases** | PostgreSQL 16, MongoDB 7, Redis 7, Memcached |
 | **Auth** | JWT (access + refresh), bcrypt, httpOnly cookies |
 | **Container Mgmt** | Dockerode (Docker Engine API) |
@@ -397,41 +313,16 @@ nexus/
 
 ## Security
 
-- **JWT Authentication** -- Access tokens (15min) + refresh tokens (7 days) with rotation
-- **Password Hashing** -- bcrypt with 12 salt rounds
-- **Rate Limiting** -- 20 requests / 15 minutes on auth endpoints
-- **WAF** -- IP block/allow rules, rate limiting per path, blocked request logging
-- **Network Isolation** -- Databases on internal-only Docker network
-- **CORS** -- Strict origin whitelist
-- **httpOnly Cookies** -- Refresh tokens stored as secure httpOnly cookies
-- **RBAC** -- Admin and viewer roles, first user auto-promoted to admin
-
----
-
-## Monitoring
-
-### Prometheus
-
-Scrapes metrics from all services every 15 seconds:
-
-```yaml
-scrape_configs:
-  - job_name: 'nexus-api'        # port 4000
-  - job_name: 'nexus-frontend'   # port 3000
-  - job_name: 'nexus-auth'       # port 6000
-  - job_name: 'nexus-cms'        # port 7000
-  - job_name: 'nexus-cdn'        # port 7001
-  - job_name: 'nexus-cache'      # port 7002
-  - job_name: 'nexus-waf'        # port 7003
-  - job_name: 'nexus-ai'         # port 5000
-  - job_name: 'nexus-mcp'        # port 5001
-```
-
-### Grafana
-
-Login at `https://grafana.sebhosting.com` with `admin` / your `GRAFANA_PASSWORD`.
-
-Pre-configured dashboards for container resources, API metrics, database performance, and cache hit rates.
+- **JWT Authentication** — Access tokens (15min) + refresh tokens (7 days) with rotation
+- **Password Hashing** — bcrypt with 12 salt rounds
+- **Rate Limiting** — 20 requests / 15 minutes on auth endpoints
+- **WAF** — IP block/allow rules, rate limiting per path, blocked request logging
+- **Network Isolation** — Databases on internal-only Docker network
+- **CORS** — Strict origin whitelist
+- **httpOnly Cookies** — Refresh tokens stored as secure httpOnly cookies
+- **RBAC** — Admin and viewer roles, first user auto-promoted to admin
+- **Non-root containers** — All services run as unprivileged `node` user
+- **Docker healthchecks** — Every service has a built-in health endpoint
 
 ---
 
@@ -442,7 +333,7 @@ Pre-configured dashboards for container resources, API metrics, database perform
 cd infrastructure/docker && docker compose up -d --build
 
 # Rebuild a single service
-docker compose up -d --build auth-service
+docker compose build --no-cache auth-service && docker compose up -d auth-service
 
 # View logs
 docker compose logs -f sites-service
@@ -453,9 +344,15 @@ docker compose ps
 # Stop everything
 docker compose down
 
-# Full rebuild
-docker compose down && docker compose up -d --build
+# Full rebuild (no cache)
+docker compose down && docker compose build --no-cache && docker compose up -d
 ```
+
+---
+
+## Documentation
+
+Full documentation available at **[nexus-docs.sebhosting.com](https://nexus-docs.sebhosting.com)**.
 
 ---
 
@@ -475,6 +372,6 @@ MIT License. See [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  Built by <strong><a href="https://sebhosting.com">SEBHosting</a></strong><br/>
+  Built by <strong><a href="https://sebhosting.com">SEB Hosting</a></strong><br/>
   Powered by Docker, TypeScript, Next.js, Express, PostgreSQL, MongoDB, Redis, Traefik, Prometheus, Grafana, and Claude AI
 </p>
