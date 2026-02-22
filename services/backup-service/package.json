@@ -12,7 +12,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "pg": "^8.13.1",
-    "node-cron": "^3.0.3",
+    "node-cron": "^4.2.1",
     "@types/express": "^5.0.6",
     "@types/cors": "^2.8.17",
     "@types/pg": "^8.11.10",
