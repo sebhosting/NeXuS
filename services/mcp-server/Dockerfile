@@ -1,5 +1,5 @@
 FROM node:25-alpine
-RUN npm install -g npm@11.10.0
+RUN npm install -g npm@11.10.1
 RUN apk add --no-cache docker-cli
 WORKDIR /app
 COPY package*.json ./

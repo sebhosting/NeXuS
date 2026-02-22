@@ -30,7 +30,7 @@ const SITES = [
 ]
 
 const TOOLS = [
-  { label: 'Grafana',     url: 'https://nexus.sebhosting.com/grafana',    icon: '📊' },
+  { label: 'Grafana',     url: 'https://grafana.sebhosting.com',    icon: '📊' },
   { label: 'Prometheus',  url: 'https://prometheus.sebhosting.com', icon: '🔥' },
   { label: 'Traefik',     url: 'https://traefik.sebhosting.com',    icon: '🔀' },
 ]

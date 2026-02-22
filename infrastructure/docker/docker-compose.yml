@@ -237,13 +237,9 @@ services:
     env_file: .env
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
-      GF_SERVER_ROOT_URL: https://nexus.sebhosting.com/grafana/
-      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_ROOT_URL: https://grafana.sebhosting.com
       GF_DASHBOARDS_JSON_ENABLED: "true"
       GF_DASHBOARDS_JSON_PATH: /var/lib/grafana/dashboards
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/dashboards:/var/lib/grafana/dashboards
@@ -252,10 +248,9 @@ services:
       - nexus-internal
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nexus-grafana.rule=Host(`nexus.sebhosting.com`) && PathPrefix(`/grafana`)"
+      - "traefik.http.routers.nexus-grafana.rule=Host(`grafana.sebhosting.com`)"
       - "traefik.http.routers.nexus-grafana.entrypoints=websecure"
       - "traefik.http.routers.nexus-grafana.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.nexus-grafana.priority=200"
       - "traefik.http.services.nexus-grafana.loadbalancer.server.port=3000"
       - "traefik.docker.network=traefik-public"
 

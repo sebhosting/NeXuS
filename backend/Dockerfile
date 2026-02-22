@@ -1,7 +1,7 @@
 FROM node:25-alpine
 
 # Upgrade npm & install tools
-RUN npm install -g npm@11.10.0 \
+RUN npm install -g npm@11.10.1 \
     && apk add --no-cache docker-cli curl bash
 
 WORKDIR /app

@@ -149,8 +149,8 @@ export default function SitesPage() {
     try {
       setLogLoading(true)
       const res = await fetch(`${SITES}/sites/${siteId}/logs`, { headers: hdrs(), credentials: 'include' })
-      const data = await res.json()
-      setLogText(typeof data === 'string' ? data : data.logs || data.output || JSON.stringify(data, null, 2))
+      const text = await res.text()
+      setLogText(text || 'No logs available')
     } catch (err: any) {
       setLogText(`Error loading logs: ${err.message}`)
     } finally {
